@@ -4,7 +4,7 @@ def checkoutD(list = []):
         for j in range(len(list[i])):
             line += list[i][j]+' '
             #print(list[i][j])
-        print(line)
+        print(line, '\n')
 
 list = [
     ['-','-','-'],
@@ -12,6 +12,8 @@ list = [
     ['-','-','-'],
 ]
 
+
+ind = 1
 while True:
     answer = input(
         """
@@ -23,6 +25,12 @@ while True:
             2 - - -
         """
     )
+    if ind % 2 == 0: # Крестик
+        list[answer[0]][answer[1]] = 'x'
+    elif ind % 2 == 1 # Нолик
+        list[answer[0]][answer[1]] = '0'
+
+    ind += 1
 
 print(answer.split())
 
@@ -30,4 +38,4 @@ print(answer.split())
 
 checkoutD(list)
 
-print(list)
+#print(list)
