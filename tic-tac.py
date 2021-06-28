@@ -154,20 +154,16 @@ move = 'x'          # Ход
 
 
 # Отформатировать входные данные
-def formatData(string, listS):  
+def formatData(string, listS):
+    gapString = ''
     for k in range(len(listS)):
-        for i in range(len(string)):
-            if(listS[k] != string[i]):
-                string = string.replace(string[i], '')
+        if len(string) > 0:
+            print(k, string, gapString)
+            for i in range(len(string)):
+                if(k != string[i]):
+                    gapString = string.replace(string[i], '')
 
-    return string
-
-
-print(list(range(len(field))))
-string = 'o 0'
-
-string.replace(' ','')
-print(string.replace(' ',''))
+    return gapString
 
 
 field = generateField()
