@@ -32,8 +32,9 @@ def is_horizontal(result):
     return False
 
 # Проверка по вертикали
-def is_vertical(result):
+def is_vertical(result,probability):
     x = len(result)
+    empty = 0
 
     for i in range(x):
 
@@ -46,9 +47,14 @@ def is_vertical(result):
                     if result[j][i] != '-':
                         if result[j+1][i] != '-':
                             victory += 1
+                elif result[j][i] == '-':
+                    empty += 1
         
         if victory == y:
             return result[j][i]
+        elif victory == (y-1) and empty == 1:
+            probability = True
+            #print(victory, empty, probability)
 
         victory = 1
 
@@ -90,6 +96,39 @@ def is_diagonal_right(result):
 
     return False
 
+# Проверка игры на ничью
+def is_empty_cage(result):
+    x = len(result)
+    empty = 0
+
+    for i in range(x):
+        y = len(result[i])
+
+        for j in range(y):
+            if(result[i][j] == '-'):
+                empty += 1
+
+    if empty == 1:
+        return True
+    else:
+        return False
+
+# Отформатировать входные данные
+def formatData(string, listS):
+    gapString = []
+    x = len(string)
+
+    for i in range(x):
+        for k in range(len(listS)):
+            if len(string) > 0:
+                if string[i].isdigit():
+                    if k == int(string[i]):
+                        gapString.append(k)
+
+    string.replace(' ', '') # Удаляем пробелы
+
+    return gapString
+
 # Вывод подсказки
 def help():
     print(
@@ -111,65 +150,41 @@ def generateField():
         ['-','-','-'],
     ]
 
-# Проверка игры на ничью
-def is_empty_cage(result):
-    x = len(result)
-    empty = 0
-
-    for i in range(x):
-        y = len(result[i])
-        for j in range(y):
-            if(result[i][j] == '-'):
-                empty += 1
-
-    if empty == 1:
-        return True
-    else:
-        return False
-
 # Повторить или закончить игру
 def nextGame(ind, field):
     next = input('Повторить? Y-Да, N-Нет - ')
-    if next.upper != 'Y':
+    print(next)
+    if next != 'Y':
         return False;
-    elif next.upper == 'Y':
+    elif next == 'Y':
         ind = 1
         field = generateField()
         help()
+        return True
 
-field = [   # Игровое поле
+# Игровое поле
+field = [
     ['-','-','-'],
     ['-','-','-'],
     ['-','-','-'],
 ]
 
-ind = 1 # Счетчик ходов
 # Игроки
 gamer = {
     'x' : 'Крестик',
     'o' : 'Нолик'
 }
-currentGamer = gamer['x'] # Игрок
-move = 'x'          # Ход
-
-
-# Отформатировать входные данные
-def formatData(string, listS):
-    gapString = ''
-    for k in range(len(listS)):
-        if len(string) > 0:
-            print(k, string, gapString)
-            for i in range(len(string)):
-                if(k != string[i]):
-                    gapString = string.replace(string[i], '')
-
-    return gapString
-
+ind = 1                     # Счетчик ходов
+currentGamer = gamer['x']   # Игрок
+move = 'x'                  # Ход
+probability = False         # Вероятность выйгрыша
 
 field = generateField()
 help()
 
 while True:
+    probability = False
+
     if ind % 2 == 1:
         currentGamer = gamer['x']
         move = 'x'
@@ -179,10 +194,8 @@ while True:
 
     answer = inputData(currentGamer)
     answer = formatData(answer, field)
-    print(len(answer), answer)
+
     if len(answer) == 2:
-        answer[0] = int(answer[0])
-        answer[1] = int(answer[1])
         coordinate = field[answer[0]][answer[1]]
 
         if coordinate == '-':
@@ -193,20 +206,21 @@ while True:
 
         output_result(field)
 
-        horizontal = is_horizontal(field)
-        vertical = is_vertical(field)
-        diagonal_left = is_diagonal_left(field)
-        diagonal_right = is_diagonal_right(field)
-        draw = is_empty_cage(field)
-        victory = horizontal or vertical or diagonal_left or diagonal_right
+        horizontal      = is_horizontal(field)
+        vertical        = is_vertical(field,probability)
+        diagonal_left   = is_diagonal_left(field)
+        diagonal_right  = is_diagonal_right(field)
+        draw            = is_empty_cage(field)
+        victory         = horizontal or vertical or diagonal_left or diagonal_right
 
         if victory:
             print("Победил игрок", gamer[victory])
             if not nextGame(ind,field):
                 break
-        elif draw:
+        elif draw and not probability:
+            #print(probability)
             print('Победитель не выявлен!')
             if not nextGame(ind,field):
                 break
     else:
-        print('Повторите ввод!')
+        print('Неверный формат, повторите ввод!')
