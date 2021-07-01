@@ -31,8 +31,8 @@ def is_horizontal(result,probability):
                 if result[i][j] == result[i][j+1]:
                     if result[i][j] != '-' and result[i][j+1] != '-':
                         victory += 1
-                elif result[i][j] == '-':
-                    empty += 1
+            if result[i][j] == '-':
+                empty += 1
 
         if victory == y:
             return result[i][j]
@@ -62,8 +62,8 @@ def is_vertical(result,probability):
                     if result[j][i] != '-':
                         if result[j+1][i] != '-':
                             victory += 1
-                elif result[j][i] == '-':
-                    empty += 1
+            if result[j][i] == '-':
+                empty += 1
         
         if victory == y:
             return result[j][i]
@@ -87,8 +87,8 @@ def is_diagonal_left(result,probability):
                 if result[i][i] != '-':
                     if result[i+1][i+1] != '-':
                         victory += 1
-            elif result[i][i] == '-':
-                empty += 1
+        if result[i][i] == '-':
+            empty += 1
 
     if victory == x:
         return result[i][i]
@@ -114,8 +114,8 @@ def is_diagonal_right(result,probability):
                 if result[i][y] != '-':
                     if result[i+1][y-1] != '-':
                         victory += 1
-            if result[i][y] == '-':
-                empty += 1
+        if result[i][y] == '-':
+            empty += 1
 
     if victory == x:
         return result[i][y]
@@ -191,7 +191,7 @@ def generate_field():
     ]
 
 
-def next_game(ind, field):
+def next_game():
     """
         Выполняет завершение или продолжение игры в зависимости
         от выбора пользователя
@@ -202,8 +202,6 @@ def next_game(ind, field):
     if next != 'Y':
         return False
     elif next == 'Y':
-        ind = 1
-        field = generate_field()
         help_game()
         return True
 
@@ -260,12 +258,18 @@ def tic_tac_toe(field):
 
             if victory:
                 print("Победил игрок", gamer[victory])
-                if not next_game(ind,field):
+                if not next_game():
                     break
+                else:
+                    ind = 1
+                    field = generate_field()
             elif draw and not probability['victory']:
                 print('Победитель не выявлен!')
-                if not next_game(ind,field):
+                if not next_game():
                     break
+                else:
+                    ind = 1
+                    field = generate_field()
         else:
             print('Неверный формат, повторите ввод!')
 
