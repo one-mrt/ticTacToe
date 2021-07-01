@@ -15,7 +15,7 @@ def input_data(gamer):
     return answer
 
 
-def is_horizontal(result):
+def is_horizontal(result,probability):
     """
         Выполняет проверку возможности победы по горизонтали
     """
@@ -24,15 +24,20 @@ def is_horizontal(result):
     for i in range(x):
         y = len(result[i])
         victory = 1
+        empty = 0
 
         for j in range(y):
             if j < (y-1):
                 if result[i][j] == result[i][j+1]:
                     if result[i][j] != '-' and result[i][j+1] != '-':
                         victory += 1
+            if result[i][j] == '-':
+                empty += 1
 
         if victory == y:
             return result[i][j]
+        elif victory == (y-1) and empty == 1:
+            probability['victory'] = True
 
         victory = 1
 
@@ -57,8 +62,8 @@ def is_vertical(result,probability):
                     if result[j][i] != '-':
                         if result[j+1][i] != '-':
                             victory += 1
-                elif result[j][i] == '-':
-                    empty += 1
+            if result[j][i] == '-':
+                empty += 1
         
         if victory == y:
             return result[j][i]
@@ -68,12 +73,13 @@ def is_vertical(result,probability):
     return False
 
 
-def is_diagonal_left(result):
+def is_diagonal_left(result,probability):
     """
         Выполняет проверку возможности победы по левой диагонали
     """
     x = len(result)
     victory = 1
+    empty = 0
 
     for i in range(x):
         if i < (x-1):
@@ -81,19 +87,24 @@ def is_diagonal_left(result):
                 if result[i][i] != '-':
                     if result[i+1][i+1] != '-':
                         victory += 1
+        if result[i][i] == '-':
+            empty += 1
 
     if victory == x:
         return result[i][i]
+    elif victory == (x-1) and empty == 1:
+        probability['victory'] = True
 
     return False
 
 
-def is_diagonal_right(result):
+def is_diagonal_right(result,probability):
     """
         Выполняет проверку возможности победы по правой диагонали
     """
     x = len(result)
     victory = 1
+    empty = 0
 
     for i in range(x):
         y = len(result[i]) - 1 - i
@@ -103,9 +114,13 @@ def is_diagonal_right(result):
                 if result[i][y] != '-':
                     if result[i+1][y-1] != '-':
                         victory += 1
-    
+        if result[i][y] == '-':
+            empty += 1
+
     if victory == x:
         return result[i][y]
+    elif victory == (x-1) and empty == 1:
+        probability['victory'] = True
 
     return False
 
@@ -176,7 +191,7 @@ def generate_field():
     ]
 
 
-def next_game(ind, field):
+def next_game():
     """
         Выполняет завершение или продолжение игры в зависимости
         от выбора пользователя
@@ -187,8 +202,6 @@ def next_game(ind, field):
     if next != 'Y':
         return False
     elif next == 'Y':
-        ind = 1
-        field = generate_field()
         help_game()
         return True
 
@@ -236,21 +249,27 @@ def tic_tac_toe(field):
 
             output_result(field)
 
-            horizontal      = is_horizontal(field)
+            horizontal      = is_horizontal(field,probability)
             vertical        = is_vertical(field,probability)
-            diagonal_left   = is_diagonal_left(field)
-            diagonal_right  = is_diagonal_right(field)
+            diagonal_left   = is_diagonal_left(field,probability)
+            diagonal_right  = is_diagonal_right(field,probability)
             draw            = is_empty_cage(field)
             victory         = horizontal or vertical or diagonal_left or diagonal_right
 
             if victory:
                 print("Победил игрок", gamer[victory])
-                if not next_game(ind,field):
+                if not next_game():
                     break
+                else:
+                    ind = 1
+                    field = generate_field()
             elif draw and not probability['victory']:
                 print('Победитель не выявлен!')
-                if not next_game(ind,field):
+                if not next_game():
                     break
+                else:
+                    ind = 1
+                    field = generate_field()
         else:
             print('Неверный формат, повторите ввод!')
 
